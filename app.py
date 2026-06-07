@@ -25,10 +25,10 @@ Level 2:
   ✅ Dependency map: "Integration X must exist before UC Y"
   ✅ Structured JSON output for downstream tools
 """
-
+from werkzeug.utils import secure_filename
 import os, json, re, base64, logging
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template, session
 from groq import Groq
 
 load_dotenv()
@@ -43,20 +43,21 @@ app.secret_key = "aivar-discovery-agent-2024"
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32 MB
 
-# ── Groq — 100% FREE. Get key at console.groq.com ────────────────────────────
+
 client = Groq(
     api_key=os.environ.get("GROQ_API_KEY")
 )
-GROQ_MODEL  = "llama-3.1-8b-instant"   # best quality on free tier
-FAST_MODEL  = "llama-3.1-8b-instant"      # for quick validation calls
+GROQ_MODEL  = "llama-3.1-8b-instant"  
+FAST_MODEL  = "llama-3.1-8b-instant"     
 
 ALLOWED_EXT = {
-    'txt', 'md', 'markdown',              # plain text / markdown
-    'pdf',                                 # PDF
-    'csv', 'xlsx', 'xls',                 # spreadsheets
-    'png', 'jpg', 'jpeg', 'gif', 'webp',  # images
-    'json',                                # JSON docs
+    'txt', 'md', 'markdown',              
+    'pdf',                                 
+    'csv', 'xlsx', 'xls',                 
+    'png', 'jpg', 'jpeg', 'gif', 'webp',  
+    'json',                                
 }
+
 
 # ═════════════════════════════════════════════════════════════════════════════
 #  FILE READING — one function per type, all return plain text
