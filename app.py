@@ -27,9 +27,11 @@ Level 2:
 """
 
 import os, json, re, base64, logging
-from flask import Flask, request, jsonify, render_template, session
-from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+from flask import Flask, render_template, request, jsonify
 from groq import Groq
+
+load_dotenv()
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
