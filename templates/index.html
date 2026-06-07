@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Agent · Aivar Innovations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06080f;--bg2:#0d1117;--bg3:#141b24;--bg4:#1a2332;
+  --border:#1e2d3d;--border2:#2a3f55;
+  --cyan:#00d4ff;--cyan-dim:rgba(0,212,255,.1);
+  --green:#00e676;--amber:#ffab00;--red:#ff5252;--purple:#7c6df5;
+  --text:#c9d5e0;--text2:#6b8299;--text3:#3d5166;
+  --mono:'IBM Plex Mono',monospace;--sans:'Manrope',sans-serif;--r:10px
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.05) 2px,rgba(0,0,0,.05) 4px);pointer-events:none;z-index:9999}
+
+/* Header */
+header{border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(0,212,255,.05) 0%,transparent 100%);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.hdr{max-width:1160px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:14px}
+.logo{width:36px;height:36px;background:conic-gradient(from 135deg,var(--cyan),var(--purple),var(--cyan));border-radius:8px;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:12px;color:#000;flex-shrink:0;box-shadow:0 0 18px rgba(0,212,255,.3)}
+.htitle{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.hsub{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase}
+.pill{margin-left:auto;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--green);background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);padding:4px 12px;border-radius:100px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Tabs */
+.tabs{max-width:1160px;margin:0 auto;padding:0 24px;display:flex;border-bottom:1px solid var(--border)}
+.tab{padding:13px 24px 11px;font-family:var(--sans);font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px}
+.tab .tn{width:20px;height:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);display:grid;place-items:center;transition:all .2s}
+.tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.tab.active .tn{background:var(--cyan);border-color:var(--cyan);color:#000}
+
+/* Layout */
+.main{max-width:1160px;margin:0 auto;padding:24px 24px 64px}
+.panel{display:none}.panel.active{display:block}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:16px}
+.clabel{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.clabel::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Mode toggle */
+.modes{display:flex;gap:6px;margin-bottom:14px}
+.mbtn{padding:7px 18px;border:1px solid var(--border2);border-radius:6px;background:none;color:var(--text2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.mbtn.on{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+
+/* Drop zone */
+.drop{border:1.5px dashed var(--border2);border-radius:var(--r);padding:34px;text-align:center;cursor:pointer;transition:all .25s;position:relative;background:linear-gradient(135deg,rgba(0,212,255,.02),transparent)}
+.drop:hover,.drop.over{border-color:var(--cyan);background:var(--cyan-dim)}
+.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:34px;margin-bottom:10px}
+.drop h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.drop p{font-family:var(--mono);font-size:11.5px;color:var(--text2)}
+
+/* File chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:3px 10px;font-family:var(--mono);font-size:11px;color:var(--text2)}
+.chip-ext{color:var(--cyan);font-weight:700}
+
+/* Textarea / input */
+.ta{width:100%;min-height:200px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:13px;color:var(--text);font-family:var(--mono);font-size:12.5px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s}
+.ta:focus{border-color:var(--cyan)}
+.tinput{width:100%;margin-bottom:9px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12.5px;outline:none;transition:border-color .2s}
+.tinput:focus{border-color:var(--cyan)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:linear-gradient(135deg,#00b8d9,var(--cyan));color:#000;border:none;border-radius:8px;font-family:var(--sans);font-weight:800;font-size:13px;cursor:pointer;transition:all .2s;letter-spacing:.2px}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,212,255,.3)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-g{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:none;border:1px solid var(--border2);color:var(--text2);border-radius:8px;font-family:var(--sans);font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-g:hover{border-color:var(--text2);color:var(--text)}
+
+/* Loader */
+.loader{display:none;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:var(--text2)}
+.loader.on{display:flex}
+.spin{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:13px 15px}
+.snum{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--cyan)}
+.slbl{font-size:10.5px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);margin-top:3px}
+
+/* System grid */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:13px}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:15px;animation:fu .3s ease both;transition:border-color .2s}
+.sc:hover{border-color:var(--border2)}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.sname{font-weight:800;font-size:15px}
+.scat{font-family:var(--mono);font-size:10px;color:var(--text2);margin-top:2px;letter-spacing:.5px}
+.mrow{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;font-size:12.5px}
+.mkey{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:70px;padding-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;font-family:var(--mono);color:var(--text2)}
+.evidence{margin-top:9px;padding:7px 10px;border-left:2px solid var(--cyan);border-radius:0 5px 5px 0;background:rgba(0,212,255,.05);font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.5}
+.unote{margin-top:7px;padding:7px 10px;border-left:2px solid var(--red);border-radius:0 5px 5px 0;background:rgba(255,82,82,.05);font-family:var(--mono);font-size:11px;color:var(--red)}
+
+/* Badges */
+.badge{flex-shrink:0;padding:3px 9px;border-radius:100px;font-family:var(--mono);font-weight:700;font-size:10.5px;white-space:nowrap}
+.bg{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.ba{background:rgba(255,171,0,.12);color:var(--amber);border:1px solid rgba(255,171,0,.25)}
+.br{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.25)}
+.bp{background:rgba(124,109,245,.12);color:var(--purple);border:1px solid rgba(124,109,245,.25)}
+.bc{background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,212,255,.25)}
+.crit-Critical{color:var(--red);font-weight:700}
+.crit-High{color:var(--amber);font-weight:700}
+.crit-Medium{color:var(--cyan);font-weight:700}
+.crit-Low{color:var(--green);font-weight:700}
+
+/* Alert box */
+.alert{padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:12px;margin-bottom:12px}
+.alert-amber{background:rgba(255,171,0,.08);border:1px solid rgba(255,171,0,.25);color:var(--amber)}
+.alert-red{background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.25);color:var(--red)}
+.alert-green{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:var(--green)}
+.alert-cyan{background:var(--cyan-dim);border:1px solid rgba(0,212,255,.25);color:var(--cyan)}
+
+/* Gap cards */
+.gc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:11px;animation:fu .3s ease both}
+.gtop{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.gsys{display:flex;align-items:center;gap:7px}
+.spill{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:4px 11px;font-size:13px;font-weight:700}
+.garr{color:var(--text3);font-size:18px}
+.pbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin:5px 0 7px}
+.pfill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width 1s ease}
+.es{padding:3px 9px;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:10.5px}
+.es-Small{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.es-Medium{background:rgba(255,171,0,.12);color:var(--amber);border:1px solid rgba(255,171,0,.25)}
+.es-Large{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.25)}
+.es-XL{background:rgba(124,109,245,.12);color:var(--purple);border:1px solid rgba(124,109,245,.25)}
+.st-Existing{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.st-Missing{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.25)}
+
+/* Use case cards */
+.uc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px;animation:fu .3s ease both}
+.uctop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ucname{font-weight:800;font-size:14px}
+.imp-High{background:rgba(255,82,82,.12);color:var(--red);border:1px solid rgba(255,82,82,.25)}
+.imp-Medium{background:rgba(255,171,0,.12);color:var(--amber);border:1px solid rgba(255,171,0,.25)}
+.imp-Low{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:6px;font-family:var(--mono);font-size:11px}
+.fsys{background:var(--bg2);border:1px solid var(--border);padding:2px 7px;border-radius:4px}
+.farr{color:var(--cyan)}
+
+/* Dep map */
+.dep{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;font-size:12.5px}
+.dep-label{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--purple);margin-bottom:5px}
+.dep-chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--text2)}
+.dep-item{background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:2px 8px}
+.dep-arr{color:var(--amber)}
+
+/* Phase */
+.ph{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:9px;display:flex;gap:13px;align-items:flex-start}
+.pnum{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--cyan));display:grid;place-items:center;font-weight:800;font-size:15px;color:#000;flex-shrink:0}
+
+/* Quick examples */
+.exs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.ex{padding:4px 10px;border:1px solid var(--border2);border-radius:6px;background:none;color:var(--text2);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .2s}
+.ex:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* Section title */
+.sec{font-size:15px;font-weight:800;margin:22px 0 13px;display:flex;align-items:center;gap:8px}
+.actions{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+hr{border:none;border-top:1px solid var(--border);margin:26px 0}
+.errbox{background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.3);border-radius:8px;padding:13px;font-family:var(--mono);font-size:12.5px;color:var(--red);margin-bottom:14px;white-space:pre-wrap}
+.hide{display:none!important}
+
+/* Source manifest */
+.sources{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.src-chip{display:flex;align-items:center;gap:5px;background:var(--bg4);border:1px solid var(--border2);border-radius:5px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr">
+    <div class="logo">DA</div>
+    <div>
+      <div class="htitle">Discovery Agent</div>
+      <div class="hsub">Aivar Innovations · Groq AI (Free)</div>
+    </div>
+    <div class="pill"><span class="dot"></span>Online · Zero Cost</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('l1')"><span class="tn">1</span>Systems Discovery</button>
+  <button class="tab" onclick="switchTab('l2')" id="tabL2"><span class="tn">2</span>Integration Gap Analysis</button>
+</div>
+
+<div class="main">
+
+  <!-- ═══════════ LEVEL 1 ═══════════ -->
+  <div class="panel active" id="panel-l1">
+
+    <div class="card">
+      <div class="clabel">Document Input</div>
+      <div class="modes">
+        <button class="mbtn on" onclick="setMode('file')">📁 Upload Files</button>
+        <button class="mbtn" onclick="setMode('text')">📝 Paste Text</button>
+      </div>
+
+      <div id="fileMode">
+        <div class="drop" id="drop">
+          <input type="file" id="fi" multiple accept=".txt,.md,.markdown,.pdf,.csv,.xlsx,.xls,.json,.png,.jpg,.jpeg,.gif,.webp">
+          <div class="drop-icon">📂</div>
+          <h3>Drop files here or click to browse</h3>
+          <p>PDF · TXT · Markdown · CSV · Excel (.xlsx/.xls) · JSON · Images (PNG/JPG/WEBP)</p>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <div id="textMode" class="hide">
+        <input id="srcName" class="tinput" placeholder="Document name e.g. company-wiki.md">
+        <textarea id="textIn" class="ta" style="min-height:200px" placeholder="Paste any company document — wiki pages, emails, tech specs, meeting notes, system lists, onboarding docs…"></textarea>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn" id="btnL1" onclick="runL1()">🔍 Discover Systems</button>
+        <div class="loader" id="ldL1"><div class="spin"></div>Analyzing with Groq AI (free)…</div>
+      </div>
+    </div>
+
+    <div id="l1Res" class="hide">
+      <div id="l1Err" class="errbox hide"></div>
+
+      <!-- Anti-hallucination notice -->
+      <div id="hallucinationAlert" class="alert alert-green hide">
+        ✅ Anti-hallucination validation complete — all systems verified against source documents.
+      </div>
+      <div id="hallucinationWarn" class="alert alert-amber hide"></div>
+
+      <!-- Sources processed -->
+      <div id="srcManifest" class="hide">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Sources Processed</div>
+        <div class="sources" id="srcList"></div>
+      </div>
+
+      <div class="stats" id="l1Stats"></div>
+      <div class="actions">
+        <button class="btn-g" onclick="dl('l1')">⬇ Export JSON</button>
+        <button class="btn" onclick="gotoL2()">→ Run Gap Analysis</button>
+      </div>
+
+      <div class="sec">📋 Discovered Systems</div>
+      <div class="sg" id="sg"></div>
+
+      <div id="flagSec" class="hide">
+        <hr>
+        <div class="sec">⚠️ Flagged for Human Review</div>
+        <div class="alert alert-amber" style="margin-bottom:14px">These systems had confidence below 70% — verify manually before building integrations.</div>
+        <div id="flagList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ LEVEL 2 ═══════════ -->
+  <div class="panel" id="panel-l2">
+
+    <div class="card">
+      <div class="clabel">Automation Use Cases</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:11px">
+        Describe what you want to automate. One use case per line. Include trigger, systems, and what data moves.
+      </p>
+
+      <div class="exs">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--text3)">Quick add →</span>
+        <button class="ex" onclick="addUC('New customer created in Salesforce → create account in NetSuite + send welcome email via SendGrid')">Invoice on signup</button>
+        <button class="ex" onclick="addUC('Approved purchase order in Coupa → sync to NetSuite nightly batch')">PO sync</button>
+        <button class="ex" onclick="addUC('Weekly pipeline report from Salesforce → post to #sales Slack channel every Monday 9am')">Weekly report</button>
+        <button class="ex" onclick="addUC('Closed-Won deal in Salesforce → provision product account + notify CS team in Slack')">Deal closed</button>
+        <button class="ex" onclick="addUC('New hire added in Workday → provision access in Okta, GitHub, Jira, and Confluence')">New hire onboarding</button>
+      </div>
+
+      <textarea id="ucIn" class="ta" style="min-height:220px"
+        placeholder="Example use cases:
+1. When a new customer is created in Salesforce, create a matching account in NetSuite
+2. Sync approved purchase orders from Coupa to NetSuite every night
+3. When an invoice is marked paid in NetSuite, update Salesforce deal stage to Closed Won
+4. Pull pipeline report from Salesforce every Friday and post to #sales Slack channel
+5. When a new hire is added in Workday, provision access in Okta and Jira"></textarea>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap">
+        <button class="btn" id="btnL2" onclick="runL2()">🗺 Analyze Gaps</button>
+        <div class="loader" id="ldL2"><div class="spin"></div>Mapping integrations…</div>
+      </div>
+
+      <div id="noInv" class="alert alert-amber hide" style="margin-top:12px">
+        ⚠ No Level 1 inventory loaded. Agent will infer systems from use case descriptions only.
+      </div>
+    </div>
+
+    <div id="l2Res" class="hide">
+      <div id="l2Err" class="errbox hide"></div>
+      <div class="stats" id="l2Stats"></div>
+      <div id="highPri" class="alert alert-cyan hide"></div>
+      <div class="actions">
+        <button class="btn-g" onclick="dl('l2')">⬇ Export JSON</button>
+      </div>
+
+      <div class="sec">🔗 Integration Gaps · Prioritized by Business Impact</div>
+      <div id="gapList"></div>
+
+      <hr>
+      <div class="sec">🎯 Use Case Mappings</div>
+      <div id="ucList"></div>
+
+      <hr>
+      <div class="sec">🔀 Dependency Map</div>
+      <div class="alert alert-cyan" style="margin-bottom:14px;font-size:12px">Integration X must exist before Use Case Y can be automated.</div>
+      <div id="depMap"></div>
+
+      <hr>
+      <div class="sec">🚀 Implementation Roadmap</div>
+      <div id="phases"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── STATE ── */
+let mode='file', files=[], l1Data=null, l2Data=null;
+
+/* ── TABS ── */
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(t==='l1'&&i===0)||(t==='l2'&&i===1)));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='l2'&&!l1Data) document.getElementById('noInv').classList.remove('hide');
+}
+
+/* ── MODE ── */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mbtn').forEach((b,i)=>{b.classList.toggle('on',(m==='file'&&i===0)||(m==='text'&&i===1));});
+  document.getElementById('fileMode').classList.toggle('hide',m!=='file');
+  document.getElementById('textMode').classList.toggle('hide',m!=='text');
+}
+
+/* ── FILE HANDLING ── */
+const drop=document.getElementById('drop'), fi=document.getElementById('fi');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');setFiles(e.dataTransfer.files)});
+fi.addEventListener('change',()=>setFiles(fi.files));
+
+const EXT_ICONS={'pdf':'📄','txt':'📝','md':'📝','csv':'📊','xlsx':'📊','xls':'📊',
+  'json':'📋','png':'🖼','jpg':'🖼','jpeg':'🖼','gif':'🖼','webp':'🖼'};
+
+function setFiles(fl){
+  files=Array.from(fl);
+  document.getElementById('chips').innerHTML=files.map(f=>{
+    const ext=f.name.split('.').pop().toLowerCase();
+    const icon=EXT_ICONS[ext]||'📁';
+    return `<div class="chip"><span class="chip-ext">${icon} ${ext.toUpperCase()}</span>${f.name}</div>`;
+  }).join('');
+}
+
+/* ── UTILS ── */
+const show=id=>document.getElementById(id)?.classList.remove('hide');
+const hide=id=>document.getElementById(id)?.classList.add('hide');
+function busy(level,on){
+  document.getElementById('btn'+level).disabled=on;
+  document.getElementById('ld'+level).classList.toggle('on',on);
+}
+function setErr(level,msg){
+  const el=document.getElementById(level+'Err');
+  el.textContent='⚠ '+msg;show(level+'Err');show(level+'Res');
+}
+
+/* ── LEVEL 1 ── */
+async function runL1(){
+  hide('l1Err'); hide('hallucinationAlert'); hide('hallucinationWarn');
+
+  if(mode==='file'){
+    if(!files.length){alert('Select at least one file');return;}
+    busy('L1',true);
+    const fd=new FormData();
+    files.forEach(f=>fd.append('files',f));
+    try{
+      const r=await fetch('/api/level1/upload',{method:'POST',body:fd});
+      const j=await r.json();
+      j.success ? renderL1(j.data) : setErr('l1',j.error+(j.raw_preview?'\n\nRaw AI output:\n'+j.raw_preview:''));
+    }catch(e){setErr('l1',e.message)}
+  } else {
+    const text=(document.getElementById('textIn').value||'').trim();
+    const src=(document.getElementById('srcName').value||'').trim()||'pasted_text.txt';
+    if(!text){alert('Paste some text first');return;}
+    busy('L1',true);
+    try{
+      const r=await fetch('/api/level1/text',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,source:src})});
+      const j=await r.json();
+      j.success ? renderL1(j.data) : setErr('l1',j.error+(j.raw_preview?'\n\nRaw AI output:\n'+j.raw_preview:''));
+    }catch(e){setErr('l1',e.message)}
+  }
+  busy('L1',false);
+}
+
+function renderL1(d){
+  show('l1Res'); l1Data=d;
+  const s=d.summary||{};
+
+  /* Hallucination alerts */
+  if((s.hallucinations_removed||0)===0){
+    show('hallucinationAlert');
+  } else {
+    const wEl=document.getElementById('hallucinationWarn');
+    wEl.textContent=`⚠ ${s.hallucinations_removed} hallucinated system(s) were automatically removed — they had no textual evidence in the source documents. ${s.confidence_downgraded||0} system(s) had confidence downgraded after verification.`;
+    show('hallucinationWarn');
+  }
+
+  /* Sources */
+  const srcs=s.sources_processed||[];
+  if(srcs.length){
+    show('srcManifest');
+    document.getElementById('srcList').innerHTML=srcs.map(s=>{
+      const ext=(s.split('.').pop()||'').toLowerCase();
+      return `<div class="src-chip">${EXT_ICONS[ext]||'📁'} ${s}</div>`;
+    }).join('');
+  }
+
+  /* Stats */
+  document.getElementById('l1Stats').innerHTML=`
+    <div class="stat"><div class="snum">${s.total_systems||0}</div><div class="slbl">Systems Found</div></div>
+    <div class="stat"><div class="snum" style="color:var(--green)">${s.high_confidence||0}</div><div class="slbl">≥70% Confident</div></div>
+    <div class="stat"><div class="snum" style="color:var(--amber)">${s.needs_review||0}</div><div class="slbl">Needs Review</div></div>
+    <div class="stat"><div class="snum">${s.document_count||0}</div><div class="slbl">Docs Processed</div></div>
+    <div class="stat"><div class="snum" style="color:${(s.hallucinations_removed||0)>0?'var(--red)':'var(--green)'}">${s.hallucinations_removed||0}</div><div class="slbl">Hallucinations Blocked</div></div>`;
+
+  /* System cards */
+  document.getElementById('sg').innerHTML=(d.systems||[]).map((sys,i)=>{
+    const sc=sys.confidence_score||0;
+    const bc=sc>=90?'bg':sc>=70?'ba':'br';
+    const cc='crit-'+(sys.criticality||'Medium');
+    const ents=(sys.key_entities||[]).slice(0,5);
+    const procs=(sys.business_processes||[]).slice(0,3);
+    return `<div class="sc" style="animation-delay:${i*.04}s">
+      <div class="stop">
+        <div><div class="sname">${sys.name}</div><div class="scat">${sys.category||''}  ·  ${sys.auth_method||''}</div></div>
+        <span class="badge ${bc}">${sc}%</span>
+      </div>
+      <div class="mrow"><span class="mkey">Criticality</span><span class="${cc}">${sys.criticality||'?'}</span></div>
+      ${ents.length?`<div class="mrow"><span class="mkey">Entities</span><div class="tags">${ents.map(e=>`<span class="tag">${e}</span>`).join('')}</div></div>`:''}
+      ${procs.length?`<div class="mrow"><span class="mkey">Processes</span><div class="tags">${procs.map(p=>`<span class="tag">${p}</span>`).join('')}</div></div>`:''}
+      <div class="mrow"><span class="mkey">Source</span><span style="font-family:var(--mono);font-size:11px;color:var(--text2)">${sys.source_document||'?'}</span></div>
+      ${sys.evidence?`<div class="evidence">📍 ${sys.evidence}</div>`:''}
+      ${sys.uncertainty_note?`<div class="unote">⚠ ${sys.uncertainty_note}</div>`:''}
+    </div>`;
+  }).join('');
+
+  /* Flagged */
+  const fl=d.flagged_for_review||[];
+  if(fl.length){
+    show('flagSec');
+    document.getElementById('flagList').innerHTML=fl.map(f=>`
+      <div class="dep" style="border-color:rgba(255,171,0,.25)">
+        <div class="dep-label">⚠ ${f.name}</div>
+        <div style="font-size:12.5px;color:var(--text2)">${f.reason}</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px">📍 ${f.source_document}</div>
+      </div>`).join('');
+  }
+}
+
+/* ── LEVEL 2 ── */
+async function runL2(){
+  const uc=(document.getElementById('ucIn').value||'').trim();
+  if(!uc){alert('Add at least one use case');return;}
+  hide('l2Err'); busy('L2',true);
+  try{
+    const r=await fetch('/api/level2/analyze',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({use_cases:uc,inventory:l1Data})
+    });
+    const j=await r.json();
+    j.success ? renderL2(j.data) : setErr('l2',j.error+(j.raw_preview?'\n\nRaw AI output:\n'+j.raw_preview:''));
+  }catch(e){setErr('l2',e.message)}
+  busy('L2',false);
+}
+
+function renderL2(d){
+  show('l2Res'); l2Data=d;
+  const s=d.summary||{};
+
+  document.getElementById('l2Stats').innerHTML=`
+    <div class="stat"><div class="snum">${s.total_use_cases||0}</div><div class="slbl">Use Cases</div></div>
+    <div class="stat"><div class="snum">${s.total_integrations_required||0}</div><div class="slbl">Integrations Needed</div></div>
+    <div class="stat"><div class="snum" style="color:var(--red)">${s.missing_integrations||0}</div><div class="slbl">Missing</div></div>
+    <div class="stat"><div class="snum" style="color:var(--green)">${s.existing_integrations||0}</div><div class="slbl">Existing</div></div>
+    <div class="stat"><div class="snum" style="font-size:15px;padding-top:5px">${s.total_effort_estimate||'—'}</div><div class="slbl">Total Effort</div></div>`;
+
+  if(s.highest_priority_gap){
+    const hpEl=document.getElementById('highPri');
+    hpEl.textContent=`🔥 Highest priority gap: ${s.highest_priority_gap} — build this first to unblock the most use cases.`;
+    show('highPri');
+  }
+
+  /* Integration gaps — sorted by priority */
+  const gaps=[...(d.integration_gaps||[])].sort((a,b)=>(b.priority_score||0)-(a.priority_score||0));
+  document.getElementById('gapList').innerHTML=gaps.map((g,i)=>{
+    const dir=g.direction==='Bidirectional'?'⇄':g.direction==='B_to_A'?'←':'→';
+    const sc=`st-${g.status||'Missing'}`;
+    return `<div class="gc" style="animation-delay:${i*.05}s">
+      <div class="gtop">
+        <div class="gsys">
+          <span class="spill">${g.system_a}</span>
+          <span class="garr">${dir}</span>
+          <span class="spill">${g.system_b}</span>
+        </div>
+        <span class="badge ${sc}">${g.status||'Missing'}</span>
+        <span class="es es-${g.effort_estimate||'Medium'}">${g.effort_estimate||'?'} · ${g.effort_days||'?'} days</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text2)">Priority ${g.priority_score||0}/100</span>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${g.priority_score||0}%"></div></div>
+      <div style="font-size:12.5px;color:var(--text2);margin-bottom:5px">${g.priority_reason||''}</div>
+      ${(g.use_cases_blocked||[]).length?`<div style="font-family:var(--mono);font-size:11px;color:var(--text3)">🔒 Blocks: ${g.use_cases_blocked.join(', ')}</div>`:''}
+      ${g.implementation_notes?`<div class="evidence" style="margin-top:7px">💡 ${g.implementation_notes}</div>`:''}
+    </div>`;
+  }).join('');
+
+  /* Use case mappings */
+  document.getElementById('ucList').innerHTML=(d.use_case_mappings||[]).map((uc,i)=>`
+    <div class="uc" style="animation-delay:${i*.04}s">
+      <div class="uctop">
+        <div><span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${uc.id}</span> <span class="ucname">${uc.name}</span></div>
+        <span class="badge imp-${uc.business_impact||'Medium'}">${uc.business_impact||'?'} impact</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--text2);margin-bottom:6px">${uc.description||''}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3)">
+        🔄 ${uc.frequency||'?'} · ~${(uc.annual_runs_estimate||0).toLocaleString()} runs/yr · Priority ${uc.automation_priority||'?'}/10
+      </div>
+      ${(uc.data_flows||[]).length?`<div class="flow">
+        ${uc.data_flows.slice(0,4).map(f=>`
+          <span class="fsys">${f.source}</span><span class="farr">→</span><span class="fsys">${f.destination}</span>
+          <span style="color:var(--text3);font-size:10px">[${f.entity_type||'data'}]</span>
+        `).join('<span style="color:var(--border2);margin:0 6px">|</span>')}
+      </div>`:''}
+    </div>`).join('');
+
+  /* Dependency map */
+  const deps=d.dependency_map||[];
+  document.getElementById('depMap').innerHTML=deps.length
+    ? deps.map(dep=>`
+      <div class="dep">
+        <div class="dep-label">Integration: ${dep.integration_label||dep.integration_id}</div>
+        <div class="dep-chain">
+          <span class="dep-item">${dep.integration_id}</span>
+          <span class="dep-arr">must exist before →</span>
+          ${(dep.must_complete_before_use_cases||[]).map(u=>`<span class="dep-item">${u}</span>`).join('<span class="dep-arr">+</span>')}
+        </div>
+        ${(dep.blocked_by_integrations||[]).length?`<div style="margin-top:5px;font-size:11px;color:var(--text3)">Blocked by: ${dep.blocked_by_integrations.join(', ')}</div>`:''}
+      </div>`).join('')
+    : '<div style="color:var(--text2);font-size:13px;padding:12px 0">No complex dependencies detected — integrations can be built independently.</div>';
+
+  /* Phases */
+  document.getElementById('phases').innerHTML=(d.recommended_implementation_order||[]).map(ph=>`
+    <div class="ph">
+      <div class="pnum">${ph.phase}</div>
+      <div style="flex:1">
+        <div style="font-weight:700;margin-bottom:2px">${ph.phase_label||'Phase '+ph.phase} <span style="font-family:var(--mono);font-size:11px;color:var(--text2);font-weight:400">· ${ph.estimated_duration||''}</span></div>
+        <div style="font-size:12.5px;color:var(--text2);margin-bottom:7px">${ph.rationale||''}</div>
+        <div class="tags" style="margin-bottom:6px">${(ph.integrations||[]).map(id=>`<span class="tag">🔗 ${id}</span>`).join('')}</div>
+        ${(ph.use_cases_unlocked||[]).length?`<div class="tags">${ph.use_cases_unlocked.map(u=>`<span class="tag" style="color:var(--green)">✅ ${u}</span>`).join('')}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+/* ── UTILS ── */
+function gotoL2(){switchTab('l2')}
+function addUC(t){const e=document.getElementById('ucIn');e.value=(e.value?e.value+'\n':'')+t}
+function dl(level){
+  const data=level==='l1'?l1Data:l2Data; if(!data)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  a.download=`aivar-discovery-${level}-${Date.now()}.json`;a.click();
+}
+</script>
+</body>
+</html>
